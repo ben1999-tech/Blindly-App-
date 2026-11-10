@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="de"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Blindly</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+@property --p{syntax:'<number>';inherits:false;initial-value:0}
+:root{--night:#0b0510;--plum:#1c0b29;--vio:#3d1760;--rose:#ff7aa8;--mag:#d92b8c;--amb:#ff9d5c;--cream:#f8ebe4;--mu:#b7a0c2;--line:rgba(255,160,200,.22);--ease:cubic-bezier(.22,.8,.3,1);--disp:'Fraunces',Georgia,serif;--font:'Nunito','Segoe UI',system-ui,sans-serif}
+*{box-sizing:border-box;margin:0;font-family:var(--font)}
+html,body{height:100%;background:var(--night);color:var(--cream);overflow:hidden}
+body{font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+button{border:0;background:none;color:inherit;cursor:pointer;font-weight:600}
+:focus-visible{outline:2px solid var(--rose);outline-offset:3px}
+.bg{position:fixed;inset:0;z-index:0;overflow:hidden;background:linear-gradient(180deg,#0b0510,#1c0b29 62%,#33103a)}
+.bg::before{content:"";position:absolute;left:-25%;right:-25%;bottom:-40%;height:78%;border-radius:50%;background:radial-gradient(closest-side,rgba(255,140,90,.5),rgba(217,43,140,.3) 55%,transparent);animation:rise 14s ease-in-out infinite alternate}
+@keyframes rise{to{transform:translateY(-6%) scale(1.08);opacity:.8}}
+.st{position:absolute;width:2px;height:2px;border-radius:50%;background:#ffe9f1;animation:tw var(--d,4s) ease-in-out infinite}
+@keyframes tw{50%{opacity:.12}}
+#app{position:relative;z-index:1;height:100%;max-width:480px;margin:0 auto;display:flex;flex-direction:column}
+.top{padding:18px 24px 4px;display:flex;align-items:baseline;justify-content:space-between}
+.logo{font-family:var(--disp);font-style:italic;font-weight:600;font-size:30px;letter-spacing:.01em}
+.logo::after{content:"✦";color:var(--amb);font-size:13px;margin-left:4px;vertical-align:super;font-style:normal}
+.sub{font-size:13px;color:var(--mu)}
+main{flex:1;position:relative;min-height:0}
+.view{position:absolute;inset:0;padding:8px 20px 12px;opacity:0;transform:translateY(14px);pointer-events:none;transition:opacity .45s var(--ease),transform .45s var(--ease);overflow-y:auto}
+.view.on{opacity:1;transform:none;pointer-events:auto}
+h2{font-family:var(--disp);font-size:26px;font-weight:600;margin:8px 0 16px}
+.stack{position:relative;height:min(66vh,600px);margin-top:4px;touch-action:pan-y}
+.card{position:absolute;inset:0;display:flex;flex-direction:column;padding:14px 14px 18px;border-radius:36px;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.02));border:1px solid var(--line);box-shadow:0 26px 60px -22px #000,inset 0 1px 0 rgba(255,255,255,.12);backdrop-filter:blur(6px);transition:transform .5s var(--ease),opacity .4s;animation:cardIn .7s var(--ease) both;user-select:none;cursor:grab}
+.card.back{transform:scale(.94) translateY(14px);opacity:.6;pointer-events:none;animation:none}
+.card.drag{transition:none;cursor:grabbing}
+@keyframes cardIn{from{opacity:0;transform:translateY(24px) scale(.97)}}
+.arch{flex:1;min-height:0;position:relative;overflow:hidden;margin:8px 10px 0;border-radius:999px 999px 24px 24px;box-shadow:0 0 0 5px rgba(255,122,168,.08),0 0 0 6px rgba(255,122,168,.4)}
+.arch::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 55%,rgba(28,11,41,.75))}
+.pf{display:block;width:100%;height:100%;overflow:hidden}
+.pf svg,.pf img{display:block;width:100%;height:100%;object-fit:cover;filter:blur(var(--bl,0px));transform:scale(1.15);transition:filter 1.3s var(--ease)}
+.lock{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);z-index:2;font-size:12px;padding:4px 13px;border-radius:99px;background:rgba(11,5,16,.55);backdrop-filter:blur(8px);color:var(--cream);white-space:nowrap}
+.meta{padding:18px 12px 0;text-align:center}
+.meta h3{font-family:var(--disp);font-size:32px;font-weight:600;line-height:1.1}
+.meta h3 span{font-weight:400;color:var(--mu);font-size:22px;margin-left:8px}
+.bio{color:#e6d3ea;font-size:15px;margin:6px 0 12px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.tags span{font-size:12.5px;padding:3px 12px;border-radius:99px;border:1px solid var(--line);color:#ffc9dc}
+.mt{margin-top:12px;font-size:13px;color:var(--amb)}
+.stamp{position:absolute;top:26px;font-family:var(--disp);font-size:22px;padding:2px 14px;border-radius:14px;opacity:0;z-index:3;background:rgba(11,5,16,.5)}
+.stamp.l{left:24px;color:var(--rose);border:2px solid var(--rose);transform:rotate(-10deg)}
+.stamp.n{right:24px;color:var(--mu);border:2px solid var(--mu);transform:rotate(10deg)}
+.acts{display:flex;justify-content:center;align-items:center;gap:30px;margin-top:20px}
+.rb{width:56px;height:56px;border-radius:50%;font-size:22px;border:1px solid var(--line);background:rgba(255,255,255,.05);transition:transform .25s var(--ease),box-shadow .25s}
+.rb.hl{width:68px;height:68px;font-size:28px;border:0;background:linear-gradient(135deg,var(--amb),var(--rose) 55%,var(--mag));box-shadow:0 12px 30px -10px var(--mag)}
+.rb:hover{transform:translateY(-3px) scale(1.07)}.rb:active{transform:scale(.93)}
+.empty{text-align:center;color:var(--mu);padding:60px 10px;animation:cardIn .6s both}
+.btn{padding:13px 26px;border-radius:99px;font-size:16px;background:linear-gradient(135deg,var(--amb),var(--rose) 55%,var(--mag));color:#2a0716;box-shadow:0 10px 26px -10px var(--mag);transition:transform .25s var(--ease),box-shadow .25s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 14px 30px -10px var(--mag)}
+.btn.ghost{background:rgba(255,255,255,.07);color:var(--cream);box-shadow:none}
+.av{width:56px;height:56px;border-radius:50%;padding:3px;flex:none;background:conic-gradient(var(--amb) calc(var(--p)*1%),rgba(255,255,255,.14) 0);transition:--p 1.2s var(--ease)}
+.av>.pf{border-radius:50%;background:#000}.av .pf svg,.av .pf img{filter:blur(calc(var(--bl)*.4))}
+.av>.pf.mono{background:linear-gradient(135deg,var(--amb),var(--rose))}
+.mono{display:grid;place-items:center;font-family:var(--disp);font-size:26px;color:#2a0716;background:linear-gradient(135deg,var(--amb),var(--rose))}
+.row{display:flex;align-items:center;gap:14px;padding:12px 14px;border-radius:24px;background:rgba(255,255,255,.04);border:1px solid var(--line);margin-bottom:10px;width:100%;text-align:left;transition:transform .3s var(--ease),background .3s;animation:cardIn .5s var(--ease) both}
+.row:hover{transform:translateX(4px);background:rgba(255,255,255,.07)}
+.row .m{flex:1;min-width:0}.row .m strong{display:block;font-family:var(--disp);font-size:18px}
+.row .m small{color:var(--mu);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--amb);box-shadow:0 0 10px var(--amb);animation:pulse 1.8s infinite}
+@keyframes pulse{50%{transform:scale(1.35);opacity:.7}}
+.sk{height:68px;border-radius:24px;margin-bottom:10px;background:linear-gradient(100deg,rgba(255,255,255,.04) 30%,rgba(255,255,255,.1) 50%,rgba(255,255,255,.04) 70%) 0 0/200% 100%;animation:sh 1.3s linear infinite}
+@keyframes sh{to{background-position:-200% 0}}
+.note{color:var(--mu);font-size:14px;line-height:1.6}
+nav{display:flex;position:relative;margin:0 18px 10px;border-top:1px solid var(--line)}
+nav button{flex:1;padding:12px 0;font-size:14px;color:var(--mu);transition:color .3s}
+nav button.on{color:var(--cream)}
+nav .ind{position:absolute;top:-1px;left:0;width:33.333%;display:flex;justify-content:center;transition:transform .45s var(--ease)}
+nav .ind::after{content:"";width:34px;height:2px;border-radius:2px;background:linear-gradient(90deg,var(--rose),var(--amb));box-shadow:0 0 12px var(--rose)}
+.chat{position:fixed;inset:0;z-index:20;background:linear-gradient(180deg,#1a0a26,var(--night));display:flex;flex-direction:column;max-width:480px;margin:0 auto;transform:translateX(100%);opacity:0;visibility:hidden;transition:transform .5s var(--ease),opacity .4s,visibility 0s .5s;padding-top:env(safe-area-inset-top,0px)}
+.chat.on{transform:none;opacity:1;visibility:visible;transition:transform .5s var(--ease),opacity .4s}
+.ch{display:flex;align-items:center;gap:12px;padding:10px 16px}
+.ch .back{font-size:26px;padding:4px 10px}
+.ch .av{width:48px;height:48px}
+.ch .t{flex:1}.ch .t strong{display:block;font-family:var(--disp);font-size:19px;line-height:1.2}.ch .t small{color:var(--mu);font-size:12px}
+.prog{height:1px;background:var(--line)}.prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--rose),var(--amb));transition:width .8s var(--ease)}
+.msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px;scroll-behavior:smooth}
+.b{max-width:80%;padding:10px 15px;border-radius:20px;white-space:pre-wrap;overflow-wrap:anywhere;animation:pop .4s var(--ease) both}
+.b.u{align-self:flex-end;margin-left:auto;background:linear-gradient(135deg,#ffc48f,#ff8fb4);color:#2a0716;border-bottom-right-radius:6px;transform-origin:100% 100%;box-shadow:0 6px 16px -8px var(--amb)}
+.b:not(.u):not(.sys){align-self:flex-start;margin-right:auto;background:#2c1545;color:var(--cream);border:1px solid rgba(190,140,255,.22);border-bottom-left-radius:6px;transform-origin:0 100%}
+.b.sys{align-self:center;max-width:90%;background:none;border:1px dashed rgba(255,157,92,.5);color:var(--amb);font-size:13px;border-radius:99px;text-align:center}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.92)}}
+.typing{display:flex;gap:5px;padding:14px 16px}.typing i{width:7px;height:7px;border-radius:50%;background:var(--mu);animation:bn 1.2s infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+@keyframes bn{0%,60%,100%{transform:none;opacity:.5}30%{transform:translateY(-5px);opacity:1}}
+.comp{display:flex;align-items:flex-end;gap:10px;padding:10px 14px 14px}
+.comp textarea{flex:1;resize:none;max-height:140px;min-height:46px;padding:12px 18px;border-radius:24px;border:1px solid var(--line);background:rgba(255,255,255,.06);color:var(--cream);font-size:16px;line-height:1.4;outline:0;transition:border-color .3s,box-shadow .3s}
+.comp textarea:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(255,122,168,.18)}
+.send{width:46px;height:46px;border-radius:50%;flex:none;font-size:18px;color:#2a0716;background:linear-gradient(135deg,var(--amb),var(--rose));transition:transform .25s var(--ease),opacity .3s,filter .3s}
+.send:hover:not(:disabled){transform:scale(1.08)}.send:disabled{opacity:.35;filter:grayscale(.6);cursor:default}
+.modal{position:fixed;inset:0;z-index:30;display:grid;place-items:center;padding:24px;background:rgba(11,5,16,.8);backdrop-filter:blur(10px);opacity:0;visibility:hidden;transition:opacity .4s,visibility 0s .4s}
+.modal.on{opacity:1;visibility:visible;transition:opacity .4s}
+.mbox{text-align:center;transform:scale(.85);transition:transform .6s var(--ease)}.modal.on .mbox{transform:none}
+.mbox h2{font-size:34px;font-style:italic;color:var(--rose);margin:22px 0 6px}
+.pair{display:flex;justify-content:center}.pair .av{width:104px;height:104px;padding:4px}.pair .av+.av{margin-left:-20px}
+.mbox .btn{display:block;margin:12px auto 0;min-width:230px}.mbox .note{margin-bottom:14px}
+.pt{position:fixed;left:0;top:0;z-index:40;pointer-events:none;font-size:18px;will-change:transform,opacity}
+.heart{position:fixed;left:50%;top:42%;z-index:35;font-size:96px;pointer-events:none;transform:translate(-50%,-50%);animation:hp .9s var(--ease) forwards;filter:drop-shadow(0 0 24px var(--mag))}
+@keyframes hp{0%{transform:translate(-50%,-50%) scale(.2);opacity:0}30%{transform:translate(-50%,-50%) scale(1.15);opacity:1}100%{transform:translate(-50%,-90%) scale(1);opacity:0}}
+#toast{position:fixed;left:50%;bottom:90px;z-index:70;transform:translate(-50%,20px);padding:10px 20px;border-radius:99px;background:rgba(28,11,41,.95);border:1px solid var(--line);opacity:0;transition:.5s var(--ease);pointer-events:none;font-size:14px;white-space:nowrap}
+#toast.on{opacity:1;transform:translate(-50%,0)}
+.glow{animation:glow 1.6s var(--ease)}
+@keyframes glow{40%{box-shadow:0 0 0 10px rgba(255,157,92,.35),0 0 40px var(--amb)}}
+.onb{position:fixed;inset:0;z-index:60;display:none;flex-direction:column;max-width:480px;margin:0 auto;padding:calc(28px + env(safe-area-inset-top,0px)) 24px 24px;background:linear-gradient(180deg,#0b0510,#1c0b29 70%,#33103a);overflow-y:auto}
+.onb.on{display:flex}
+.obar{height:3px;border-radius:3px;background:rgba(255,255,255,.1);margin-bottom:34px;flex:none}.obar i{display:block;height:100%;background:linear-gradient(90deg,var(--rose),var(--amb));border-radius:3px;transition:width .6s var(--ease)}
+.step{animation:cardIn .6s var(--ease) both;display:flex;flex-direction:column;gap:12px;flex:1}.step.na{animation:none}
+.oq{font-family:var(--disp);font-size:28px;line-height:1.2;font-weight:600;margin-bottom:10px}
+.opts{display:flex;flex-direction:column;gap:10px}.opts.g{flex-direction:row;flex-wrap:wrap}
+.opt{padding:14px 18px;border-radius:18px;border:1px solid var(--line);background:rgba(255,255,255,.03);text-align:left;font-size:16px;transition:all .25s var(--ease)}
+.opt:hover{border-color:var(--rose);transform:translateX(3px)}
+.opt.sel{background:linear-gradient(135deg,rgba(255,122,168,.28),rgba(217,43,140,.28));border-color:var(--rose)}
+.opt.sm{padding:8px 15px;border-radius:99px;font-size:14px}.opt.sm:hover{transform:none}
+.inp{padding:14px 18px;border-radius:18px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--cream);font-size:17px;outline:0}.inp:focus{border-color:var(--rose)}
+.nx{display:flex;gap:10px;margin-top:auto;padding-top:18px}.nx .btn{flex:1}
+.big{font-size:64px;text-align:center}
+.ibox{padding:14px 16px;border-radius:18px;border:1px solid rgba(255,157,92,.4);background:rgba(255,157,92,.08);color:#ffd9bd;font-size:14px;animation:cardIn .5s var(--ease) both}
+.pcard{text-align:center;padding:10px 0 20px}.pcard .mono{width:88px;height:88px;border-radius:50%;margin:0 auto 12px;font-size:40px}
+.pcard h3{font-family:var(--disp);font-size:28px}.pty{color:var(--amb);margin:4px 0}.pcard .tags{margin-top:12px}
+.setr{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 16px;border-radius:20px;border:1px solid var(--line);background:rgba(255,255,255,.04);margin-bottom:12px}.setr small{display:block;color:var(--mu)}
+.sw{width:50px;height:30px;border-radius:99px;background:rgba(255,255,255,.14);position:relative;transition:background .3s;flex:none}.sw i{position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .3s var(--ease)}.sw.on{background:linear-gradient(135deg,var(--rose),var(--mag))}.sw.on i{transform:translateX(20px)}
+.pb{display:flex;gap:10px;margin:16px 0}.pb .btn{flex:1;font-size:14px;padding:12px 10px}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+</style></head><body>
+<div class="bg" id="bg"></div>
+<div id="app">
+<header class="top"><span class="logo">blindly</span><span class="sub">erst reden, dann sehen</span></header>
+<main>
+<section class="view on" id="v-disc"><div class="stack" id="stack"></div>
+<div class="acts"><button class="rb" id="nope" aria-label="Weiter">✕</button><button class="rb hl" id="like" aria-label="Gefällt mir">♥</button></div></section>
+<section class="view" id="v-chats"><h2>Deine Matches</h2><div id="list"></div></section>
+<section class="view" id="v-me"><div id="prof"></div></section>
+</main>
+<nav id="nav"><span class="ind" id="ind"></span><button data-v="disc" class="on">Entdecken</button><button data-v="chats">Chats</button><button data-v="me">Profil</button></nav>
+</div>
+<div class="chat" id="chat"><div class="ch"><button class="back" id="back" aria-label="Zurück">‹</button><div class="av" id="cav"></div><div class="t"><strong id="cn"></strong><small id="cs"></small></div></div>
+<div class="prog"><i id="pg"></i></div><div class="msgs" id="msgs"></div>
+<div class="comp"><textarea id="ta" rows="1" placeholder="Schreib etwas Nettes …" aria-label="Nachricht"></textarea><button class="send" id="send" disabled aria-label="Senden">➤</button></div></div>
+<div class="modal" id="match"><div class="mbox"><div class="pair" id="pair"></div><h2>Es ist ein Match!</h2><p class="note" id="mt"></p><button class="btn" id="mgo">Nachricht schreiben</button><button class="btn ghost" id="mx">Weiter entdecken</button></div></div>
+<div class="onb" id="onb"></div>
+<div id="toast"></div>
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const rnd=a=>a[Math.floor(Math.random()*a.length)],red=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const BOTS=[
+{id:'anna',n:'Anna',a:24,sg:'Zwillinge',job:'arbeite im Marketing',fun:'Meine Freizeit besteht aus Kaffee, Humor und spontanen Ideen.',bio:'Frech, offen und immer für einen Spruch zu haben.',tg:['Humor','Kaffee','Spontan'],hb:['Filme','Reisen','Kochen'],sk:'#f1c9a5',hr:'#7a3b1d',cl:'#d92b8c',st:'long',h:330},
+{id:'sophie',n:'Sophie',a:26,sg:'Jungfrau',job:'studiere Literatur im Master',fun:'Ich lese viel, trinke zu viel Tee und gehe gern spazieren.',bio:'Ruhig und nachdenklich. Bücher und lange Gespräche mag ich am liebsten.',tg:['Bücher','Tee','Tiefgang'],hb:['Lesen','Fotografie','Musik'],sk:'#e8bf9c',hr:'#2b1a16',cl:'#4d2a7a',st:'bob',h:270},
+{id:'mia',n:'Mia',a:23,sg:'Schütze',job:'mache eine Ausbildung zur Eventmanagerin',fun:'Ich bin ständig unterwegs, tanze zu viel und rede noch mehr.',bio:'Immer unterwegs, immer gut gelaunt, selten still.',tg:['Reisen','Festivals','Tanzen'],hb:['Reisen','Tanzen','Musik'],sk:'#c98f68',hr:'#3a1d12',cl:'#ff8a4d',st:'curly',h:20},
+{id:'leon',n:'Leon',a:27,sg:'Löwe',job:'arbeite als Physiotherapeut',fun:'Ich spiele Volleyball, grille gern und lache am lautesten über meine eigenen Witze.',bio:'Sportlich, selbstbewusst und mit einem Augenzwinkern.',tg:['Sport','Humor','Grillen'],hb:['Sport','Fußball','Kochen'],sk:'#dcae8a',hr:'#4a2e1a',cl:'#2b6fa8',st:'short',h:210},
+{id:'jonas',n:'Jonas',a:25,sg:'Steinbock',job:'bin Softwareentwickler',fun:'Nach Feierabend gibt es Kopfhörer, Serien und gelegentlich ein Bastelprojekt.',bio:'Eher leise, technikbegeistert. Sarkasmus ist meine Muttersprache.',tg:['Technik','Musik','Serien'],hb:['Technik','Gaming','Filme'],sk:'#efd0b3',hr:'#1c1a24',cl:'#52456b',st:'short',h:285}];
+const HAIR={long:['M33 64C27 28 46 17 60 17s33 11 27 47l4 44H29z','M37 57C39 37 51 29 60 29s22 8 23 28C70 46 52 45 37 57z'],bob:['M33 72C27 30 46 17 60 17s33 13 27 55l-3 10H36z','M36 58C40 36 52 29 60 29s22 7 24 29C70 47 52 46 36 58z'],curly:['M60 14c20 0 36 14 33 34-2 12-6 22-9 28H36c-3-6-7-16-9-28C24 28 40 14 60 14z','M37 56C39 38 51 30 60 30s22 8 23 26C70 46 52 45 37 56z'],short:['','M36 56C32 30 50 21 60 21s30 9 25 35C78 40 46 38 36 56z']};
+function portrait(b){const [k,f]=HAIR[b.st];return `<svg viewBox="0 0 120 150" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="g${b.id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="hsl(${b.h} 50% 22%)"/><stop offset="1" stop-color="hsl(${(b.h+50)%360} 80% 55%)"/></linearGradient></defs><rect width="120" height="150" fill="url(#g${b.id})"/><circle cx="86" cy="42" r="16" fill="#ffd9a8" opacity=".35"/><path d="M8 150C12 114 38 102 60 102s48 12 52 48z" fill="${b.cl}"/><rect x="52" y="82" width="16" height="24" rx="7" fill="${b.sk}"/><path d="${k}" fill="${b.hr}"/><ellipse cx="60" cy="62" rx="22" ry="26" fill="${b.sk}"/><path d="${f}" fill="${b.hr}"/></svg>`}
+const SIGNS=['Widder','Stier','Zwillinge','Krebs','Löwe','Jungfrau','Waage','Skorpion','Schütze','Steinbock','Wassermann','Fische'];
+const HOBS=['Musik','Filme','Sport','Gaming','Kochen','Reisen','Lesen','Fotografie','Tanzen','Technik'];
+const TYPES=[['Der Denker','🌙','Du hörst zu, bevor du sprichst, und magst Gespräche mit Tiefe.'],['Der Charmeur','✨','Du bringst Leute zum Lachen und findest schnell den richtigen Ton.'],['Der Funke','🔥','Du bist spontan und steckst andere mit deiner Energie an.'],['Der Antreiber','⚡','Du hast Ziele und teilst gern, was dich begeistert.']];
+const STEPS=[{k:'name',q:'Willkommen bei Blindly. Wie dürfen wir dich nennen?',t:'text'},
+{k:'per',q:'Wie würdest du dich am ehesten beschreiben?',t:'one',o:['Ruhig und nachdenklich','Locker und humorvoll','Spontan und gesellig','Ehrgeizig und sportlich']},
+{k:'we',q:'Wie sieht dein perfektes Wochenende aus?',t:'one',o:['Couch, Serie und Ruhe','Draußen in der Natur','Mit Freunden unterwegs','Etwas Neues entdecken']},
+{k:'hob',q:'Was machst du gern? Such dir ein paar aus.',t:'multi',o:HOBS},
+{k:'nt',q:'Nachteule oder Frühaufsteher?',t:'one',o:['Eindeutig Nachteule','Eher Frühaufsteher','Kommt auf den Tag an']},
+{k:'goal',q:'Was suchst du hier?',t:'one',o:['Etwas Lockeres','Tiefe Gespräche','Eine feste Beziehung','Ich lass es auf mich zukommen']},
+{k:'astro',q:'Glaubst du an Sternzeichen?',t:'astro'}];
+const BK={
+anna:{greet:['Na, du! Ich dachte schon, du traust dich nicht 😄','Hey hey. Du hast Glück, ich bin heute in Plauderlaune.'],
+joke:['Okay, der war gar nicht so schlecht. Sechs von zehn Punkten, mehr gibt’s nur gegen Schokolade 😂','Haha, du bist frech. Das mag ich eigentlich.'],
+hobby:['{h}? Ach komm, dann haben wir Gesprächsstoff. Ich bin da nicht perfekt, aber meine Meinung dazu hab ich trotzdem 😏','{h} ist ein Pluspunkt für dich. Ich notiere mir das.'],
+day:['Klingt nach einem Tag, der Kaffee verdient hat. Bei mir war Chaos: Bus fast verpasst und dann einer Taube ausgewichen 🙈','Puh, kenn ich. Manchmal will man abends nur noch aufs Sofa.'],
+feel:['Hey, klingt nach einem Moment zum Durchatmen. Ich schick dir virtuell einen Keks 🍪','Das tut mir leid. Aber du bist ja hier, und ich bin ziemlich gut im Ablenken.'],
+comp:['Oh, du kannst ja charmant sein. Gut, dass mich niemand rot sehen kann 😅','Danke! Dafür hast du dir einen Extrapunkt verdient.'],
+flirt:['Mutig. Ich mag Mut, aber erst schauen wir, ob du über meine Witze lachst 😉','Langsam, langsam. Erst quatschen, dann sehen wir weiter. Neugierig bin ich aber.'],
+deep:['Ehrlich? Ich bin nach außen immer locker, aber über sowas denke ich nachts oft nach. Was einem wichtig ist, merkt man meist erst, wenn es fehlt.','Ich will glaub ich jemanden, mit dem ich albern sein und trotzdem ernst reden kann.'],
+story:['Kurze Geschichte: Ich wollte Pfannkuchen machen und hab Salz statt Zucker genommen. Mein Mitbewohner hat tapfer gegessen 😂','Mir fällt ein, ich hab letzte Woche einem Fremden mein Rad geliehen, weil er so verzweifelt aussah. Es kam sogar zurück!'],
+fb:['Hm, erzähl mehr. Da steckt doch bestimmt eine Geschichte dahinter.','Ha, okay. Das hab ich nicht kommen sehen.']},
+sophie:{greet:['Hallo. Schön, dass du schreibst. Ich hatte gerade eine Tasse Tee in der Hand und eigentlich auf so etwas gehofft.','Hi. Ich freue mich über deine Nachricht.'],
+joke:['Das hat mich wirklich zum Schmunzeln gebracht. Ich lache leise, aber ehrlich.','Haha, schön. Humor sagt viel über einen Menschen aus.'],
+hobby:['{h} klingt nach etwas, das dir wirklich Freude macht. Ich finde es spannend, womit Menschen ihre Zeit verbringen.','Bei {h} geht es ja oft gar nicht um das Tun, sondern um das Gefühl danach, oder?'],
+day:['Das klingt nach einem langen Tag. Ich hatte heute auch viel im Kopf und war am Ende froh über ein bisschen Stille.','Manche Tage sind einfach voll. Danach tut es gut, kurz anzukommen.'],
+feel:['Danke, dass du das teilst. Gefühle brauchen manchmal einfach etwas Zeit, bis sie sich sortieren.','Das verstehe ich gut. Du musst nicht gleich alles erklären.'],
+comp:['Das ist lieb von dir. Ich werde ein wenig verlegen, aber es freut mich.','Danke. So etwas bleibt mir länger im Kopf, als man denkt.'],
+flirt:['Du bist ziemlich direkt. Ich mag es aber, wenn man sich erst langsam kennenlernt.','Das klingt schön. Lass uns das in Ruhe wachsen lassen.'],
+deep:['Ich glaube, am wichtigsten ist mir Ehrlichkeit. Und dass man sich gegenseitig genug Raum lässt, ohne sich fern zu sein.','Darüber denke ich oft nach. Vielleicht ist Zukunft weniger ein Plan als eine Richtung.'],
+story:['Ich habe neulich in einem Antiquariat ein Buch mit handschriftlicher Widmung gefunden. Seitdem frage ich mich, wer die beiden waren.','Heute früh war der Himmel so klar, dass ich spontan einen Umweg zur Arbeit gelaufen bin. Hat sich gelohnt.'],
+fb:['Interessant. Ich denke gerade darüber nach, was dahinter steckt.','Das lasse ich mal kurz auf mich wirken. Magst du mehr dazu sagen?']},
+mia:{greet:['Heeey! Endlich schreibt jemand, ich hab schon fast mit mir selbst geredet 😂','Hii! Wie schön, du bist da! Ich bin heute sowas von aufgedreht!'],
+joke:['HAHA, stopp, ich muss lachen! 😂 Ich glaub, der kommt in meine Sammlung!','Okay, der saß! Du bist witzig, das gefällt mir!'],
+hobby:['{h}?! Das find ich mega! Ich bin da total dabei, ich probier ja alles mal aus 🙌','Oh, {h}! Da könnte ich stundenlang drüber reden, pass auf, ich fang wirklich an 😄'],
+day:['Boah, krass, das klingt nach viel! Ich war heute auch ständig auf dem Sprung, zwischen Termin, Freunden und Eis essen 🍦','Ach ja, kenn ich total! Ich bin abends oft so müde, dass ich im Sitzen einschlafe.'],
+feel:['Ohh, komm her, virtuelle Umarmung! 🤗 Morgen sieht alles schon wieder besser aus.','Das versteh ich total! Manchmal ist einfach alles zu viel. Aber du schaffst das!'],
+comp:['Awww, danke!! Ich werd ganz rot 🙈 Du bist echt süß!','Stopp, ich freu mich gerade zu doll! 😍'],
+flirt:['Oho, na du traust dich was! Ich find’s irgendwie süß 😏','Hihi, das macht mich ganz kribbelig. Gut, dass du so nett bist!'],
+deep:['Ich wirke immer laut, aber ehrlich: Mir ist wichtig, dass man sich bei jemandem wirklich fallen lassen kann. Und dass man zusammen Abenteuer erlebt.','Zukunft? Ich will viel sehen und trotzdem irgendwo ankommen. Klingt widersprüchlich, ich weiß 😅'],
+story:['Ich muss dir was erzählen! Letzte Woche hab ich im Zug aus Versehen mit einem Fremden Tauschspiele gespielt. Wir sind drei Stationen zu weit gefahren 😂','Ach, übrigens: Ich hab gestern spontan getanzt, mitten auf dem Gehweg. Ein Opa hat applaudiert!'],
+fb:['Haha, erzähl, erzähl! Ich bin ganz Ohr!','Spannend! Ich hab sofort so viele Gedanken dazu 😄']},
+leon:{greet:['Na, wer traut sich denn da? Gute Wahl, ich bin ein ziemlich guter Gesprächspartner.','Hey! Du hast gerade meinen Abend verbessert. Kein Druck, aber fast.'],
+joke:['Haha, nicht schlecht! Ich bleib trotzdem der Lustigere von uns 😎','Okay, den lass ich gelten. Du hast Humor, das gefällt mir.'],
+hobby:['{h}, stark. Ich bin da zwar eher Hobby-Profi als echter Profi, aber ich geb alles 💪','{h} passt zu dir, das merkt man irgendwie. Ich mag Leute, die ihre Sachen durchziehen.'],
+day:['Klingt nach einem vollen Tag. Bei mir war Training und danach Pizza. Beides war überfällig 🍕','Das kenn ich. Dann braucht man abends nur noch gutes Essen und ein bisschen Ruhe.'],
+feel:['Hey, das kriegen wir wieder hin. Manchmal hilft ein langer Spaziergang mehr als jeder Ratschlag.','Klingt nicht leicht. Aber du wirkst auf mich ziemlich stabil.'],
+comp:['Danke, ich nehm das Kompliment gern an. Ich hatte sowieso nichts anderes erwartet 😄','Das geb ich zurück. Du hast eine angenehme Art zu schreiben.'],
+flirt:['Ich mag Direktheit. Aber ich warne dich, ich bin schwer zu beeindrucken … außer mit Humor 😉','Na, das läuft ja richtig gut hier. Ich bin gespannt, wohin das führt.'],
+deep:['Ich wirke locker, aber mir ist Verlässlichkeit wichtig. Einer, der auch mal Nein sagt und trotzdem bleibt.','Zukunft? Ich will mehr Zeit draußen, weniger Stress und jemanden, mit dem ich lachen kann.'],
+story:['Gestern hab ich beim Volleyball den Ball ins Gesicht bekommen. Mein Team lacht immer noch. Ich auch 😅','Ich hab neulich versucht, für Freunde zu grillen und die Kohle vergessen. Wir haben dann Müsliriegel gegessen.'],
+fb:['Interessant. Erzähl mal, ich hab Zeit und Laune.','Ha, okay. Das muss ich kurz sacken lassen.']},
+jonas:{greet:['Hi. Du schreibst tatsächlich zuerst. Mutig. Oder Langeweile.','Hallo. Ich habe gerade zwei Tabs offen und freue mich über die Ablenkung.'],
+joke:['Haha, okay. Ich notiere: Humorlevel akzeptabel.','Das war gut. Ich hab innerlich gelacht, äußerlich nur geschmunzelt.'],
+hobby:['{h} also. Ich hab da eine Meinung, aber ich bin bei sowas lieber erst vorsichtig 😏','{h} ist okay. Ich kann mich für Dinge begeistern, aber leise.'],
+day:['Das klingt anstrengend. Bei mir war es ein Tag aus Meetings, die auch eine Mail hätten sein können.','Kenn ich. Abends will man nur noch Kopfhörer und Ruhe.'],
+feel:['Das klingt nach einer Menge. Wenn’s hilft: Ich bin ein ganz guter Zuhörer, auch wenn ich es selten zugebe.','Nicht leicht, ich weiß. Ein Schritt nach dem anderen, wie beim Debuggen.'],
+comp:['Oh. Danke. Ich weiß jetzt nicht, was ich sagen soll, was selten vorkommt 😅','Das hör ich selten. Danke, wirklich.'],
+flirt:['Du bist ja ganz schön forsch. Ich mag das, aber ich antworte lieber mit Sarkasmus, nicht aus Prinzip, sondern aus Nervosität.','Soso. Das hätte ich nicht auf meiner Liste gehabt, aber ich streich es nicht durch.'],
+deep:['Mir ist wichtig, dass man sich nicht verstellen muss. Und dass es okay ist, zusammen zu schweigen.','Ich plane gern, aber ich weiß, dass das Leben selten nach Plan läuft. Das nervt und fasziniert mich zugleich.'],
+story:['Heute hab ich ein Problem stundenlang gesucht, am Ende war es ein falsches Zeichen. Klassiker.','Ich hab mir neulich neue Kopfhörer gekauft und ein Album gehört, das ich vorher nie beachtet hatte. Es war überraschend gut.'],
+fb:['Hm. Spannend. Sag mehr.','Okay. Das ist interessanter, als ich dachte.']}};
+const CB={anna:'Apropos {h}: dazu hab ich noch eine Meinung, aber die gibt’s nur gegen Kaffee ☕',sophie:'Ich musste gerade an {h} denken, das du vorhin erwähnt hast. Das ist hängen geblieben.',mia:'Ey, und wegen {h} von vorhin: Wir müssen unbedingt weiter darüber reden!',leon:'Zurück zu {h}: Ich glaub, da könnte ich dich locker fordern 😎',jonas:'Ich bin noch bei {h}. Das lässt mich nicht los.'};
+const QS=['Was war dein schönster Moment diese Woche?','Eher Frühaufsteher oder Nachteule?','Was bringt dich zuverlässig zum Lachen?','Wohin würdest du spontan verreisen?','Welches Lied läuft bei dir gerade rauf und runter?','Was machst du an einem freien Tag?','Welche Kleinigkeit macht deinen Tag besser?','Hast du ein Ritual für den Sonntag?'];
+const HOB={Fußball:/fu(ß|ss)ball|kicken|stadion/,Musik:/musik|konzert|playlist|band|singen|gitarre/,Filme:/film|serie|netflix|kino/,Gaming:/zock|gaming|playstation|videospiel/,Kochen:/koch|backen|pizza|essen/,Reisen:/reise|urlaub|strand|verreis/,Sport:/sport|gym|laufen|joggen|fitness|training/,Lesen:/buch|bücher|lesen/,Fotografie:/foto|kamera/,Tanzen:/tanz/,Technik:/technik|computer|programmier/};
+const HS={Fußball:['Spieltage mit Freunden sind sowieso am besten, egal wer gewinnt.','Ein Abend im Stadion hat schon was Besonderes.'],Musik:['Ein guter Song kann einen ganzen Tag drehen.','Bei Musik merke ich schnell, wer zu mir passt.'],Filme:['Ich mag Filme, über die man danach noch lange redet.','Serienabende sind für mich fast ein Ritual.'],Gaming:['Gemeinsam zocken ist ein ziemlich guter Charaktertest.','Bei Spielen gewinnt, wer trotzdem lacht.'],Kochen:['Wer gut kocht, hat bei mir sofort Pluspunkte.','Selbstgekochtes schmeckt irgendwie nach Zuhause.'],Reisen:['Am schönsten sind die Orte, die man nicht geplant hat.','Fremde Städte zu Fuß entdecken ist mein Favorit.'],Sport:['Nach dem Sport ist der Kopf angenehm leer.','Bewegung macht mich glücklicher, als ich zugeben will.'],Lesen:['Ein gutes Buch rettet jeden Regentag.','Ich mag Menschen, die Geschichten erzählen können.'],Fotografie:['Ein Foto hält Momente fest, die man sonst vergisst.','Licht ist alles, das lernt man beim Fotografieren.'],Tanzen:['Beim Tanzen vergisst man, was man alles denken wollte.','Tanzen ist die ehrlichste Art, sich auszudrücken.'],Technik:['Ich mag es, wenn Dinge endlich funktionieren.','Technik ist wie ein Rätsel mit eingebautem Erfolgserlebnis.']};
+
+const TOP=[['about',/wie alt bist|wie heißt du|was machst du beruflich|was arbeitest|was studierst|erzähl.*von dir|stell dich vor/],['joke',/ha(ha)+|lol|😂|🤣|witz|lustig/],['flirt',/date|kuss|flirt|mag dich|❤|😘|verknallt|treffen/],['comp',/hübsch|süß|schön|gefällst|sympathisch|nett von dir/],['feel',/müde|stress|traurig|glücklich|schlecht|nervös|aufgeregt|gut drauf|mies/],['deep',/zukunft|träum|angst|beziehung|liebe|ziele|ehrlich|erwartung/],['day',/heute|arbeit|schule|uni|job|ausbildung|wochenende|unterwegs|feierabend/],['greet',/^(hi|hey|hallo|moin|servus|na)\b/]];
+const STOP=/^(ziemlich|eigentlich|vielleicht|wirklich|heute|gestern|morgen|jetzt|einfach|dass|aber|oder|auch|noch|schon|dann|weil|wenn|habe|hatte|werde|wurde|kannst|machst|gerade|immer|manchmal|ganz|sehr|mehr|viel|nicht|nichts|eher|bisschen|außerdem|danke|bitte|selten|meistens)$/;
+const SH=['Haha ja 😄','Stimmt.','Mhm, kann ich verstehen.','Oh, wirklich?','Okay 😊','Interessant!','Ah ja?','Das glaub ich dir.'];
+const ACK=['{w}, das gefällt mir.','Okay, {w} also. Das passt irgendwie zu dir.','{w}? Hätte ich nicht gedacht, aber ich mag’s.','Ah, {w}. Da steckt bestimmt mehr dahinter.','Ich bleib kurz bei {w}, das klingt nach dir.'];
+const PS={anna:' 😏',sophie:'',mia:' 😍',leon:' 😎',jonas:''};
+let S;try{S=JSON.parse(localStorage.getItem('blindly_v3'))}catch(e){}
+S=S||{me:null,astro:false,dec:{},chats:{}};const save=()=>{try{localStorage.setItem('blindly_v3',JSON.stringify(S))}catch(e){}};
+const bot=id=>BOTS.find(b=>b.id===id);
+const ucount=id=>(S.chats[id]?.m||[]).filter(x=>x.r==='u').length,lvl=id=>Math.min(1,ucount(id)/8),blur=id=>Math.round(14*(1-lvl(id)));
+
+const avHTML=(b,bl)=>`<span class="pf" style="--bl:${bl}px">${b.img?`<img src="${b.img}" alt="">`:portrait(b)}</span>`;
+function toast(t){const o=$('#toast');o.textContent=t;o.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>o.classList.remove('on'),2600)}
+function burst(x,y,n=26){if(red)return;const sy=['♥','✦','•','♡'],cs=['#ff7db3','#d6338f','#ff9a5c','#c8a2ff'];
+for(let i=0;i<n;i++){const p=document.createElement('span');p.className='pt';p.textContent=rnd(sy);p.style.color=rnd(cs);document.body.appendChild(p);
+const a=Math.random()*Math.PI*2,d=70+Math.random()*130;p.animate([{transform:`translate(${x}px,${y}px) scale(.4)`,opacity:1},{transform:`translate(${x+Math.cos(a)*d}px,${y+Math.sin(a)*d+40}px) scale(${.8+Math.random()}) rotate(${Math.random()*260-130}deg)`,opacity:0}],{duration:1100+Math.random()*700,easing:'cubic-bezier(.2,.7,.3,1)'}).onfinish=()=>p.remove()}}
+function heart(){if(red)return;const h=document.createElement('div');h.className='heart';h.textContent='💗';document.body.appendChild(h);setTimeout(()=>h.remove(),950)}
+/* Navigation */
+let cur='disc';function go(v){cur=v;$$('.view').forEach(e=>e.classList.toggle('on',e.id==='v-'+v));$$('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));$('#ind').style.transform=`translateX(${['disc','chats','me'].indexOf(v)*100}%)`;if(v==='chats')renderList();if(v==='me')renderProfile()}
+$$('nav button').forEach(b=>b.onclick=()=>go(b.dataset.v));
+/* Entdecken */
+function compat(b){const m=S.me||{hobbies:[]};let p=64+b.hb.filter(h=>m.hobbies.includes(h)).length*7+(b.id.charCodeAt(0)+b.id.length*5)%13;if(S.astro&&m.sign)p+=(SIGNS.indexOf(m.sign)+SIGNS.indexOf(b.sg))%4===0?8:3;return Math.min(98,p)}
+function renderStack(){const st=$('#stack');let q=BOTS.filter(b=>!S.dec[b.id]);if(S.astro)q=q.sort((a,b)=>compat(b)-compat(a));st.innerHTML='';
+if(!q.length){st.innerHTML='<div class="empty"><p style="font-size:44px">💫</p><p style="margin:10px 0 18px">Du hast alle Profile gesehen.</p><button class="btn" id="again">Nochmal ansehen</button></div>';$('#again').onclick=()=>{S.dec={};save();renderStack()};return}
+q.slice(0,2).reverse().forEach((b,i,arr)=>{const c=document.createElement('div');c.className='card'+(i<arr.length-1?' back':'');c.dataset.id=b.id;
+c.innerHTML=`<span class="stamp l">gefällt</span><span class="stamp n">weiter</span><div class="arch">${avHTML(b,14)}<span class="lock">Bild verborgen</span></div><div class="meta"><h3>${b.n}<span>${b.a}</span></h3><p class="bio">${b.bio}</p><div class="tags">${b.tg.map(t=>`<span>${t}</span>`).join('')}</div><p class="mt">${compat(b)} % Übereinstimmung${S.astro?' · '+b.sg:''}</p></div>`;st.appendChild(c)});attach(st.lastChild)}
+function attach(c){let x0=null,dx=0;const L=c.querySelector('.l'),N=c.querySelector('.n');
+c.onpointerdown=e=>{x0=e.clientX;c.classList.add('drag');c.setPointerCapture(e.pointerId)};
+c.onpointermove=e=>{if(x0===null)return;dx=e.clientX-x0;c.style.transform=`translateX(${dx}px) rotate(${dx/18}deg)`;L.style.opacity=Math.max(0,dx/100);N.style.opacity=Math.max(0,-dx/100)};
+c.onpointerup=()=>{if(x0===null)return;c.classList.remove('drag');x0=null;if(Math.abs(dx)>100)decide(dx>0);else{c.style.transform='';L.style.opacity=N.style.opacity=0}dx=0}}
+let busy=false;
+function decide(like){const c=$('#stack .card:not(.back)');if(!c||busy)return;busy=true;const b=bot(c.dataset.id);
+c.classList.remove('drag');c.style.transform=`translateX(${like?600:-600}px) rotate(${like?30:-30}deg)`;c.style.opacity=0;
+S.dec[b.id]=like?'like':'pass';if(like){heart();burst(innerWidth/2,innerHeight*.42,14);if(!S.chats[b.id]){S.chats[b.id]={m:[],mem:{h:[]},used:[],unread:0,started:false}}}save();
+setTimeout(()=>{busy=false;renderStack();if(like)showMatch(b)},red?0:420)}
+$('#like').onclick=()=>decide(true);$('#nope').onclick=()=>decide(false);
+function showMatch(b){const me=S.me?S.me.name[0].toUpperCase():'♥';$('#pair').innerHTML=`<div class="av" style="--p:100"><span class="pf mono">${esc(me)}</span></div><div class="av" style="--p:0">${avHTML(b,14)}</div>`;
+requestAnimationFrame(()=>$('#pair').lastChild.style.setProperty('--p',0));$('#mt').textContent=`Du und ${b.n} habt euch gefunden (Demo-Profil). Das Bild wird mit jeder Nachricht klarer.`;$('#match').classList.add('on');$('#match').dataset.id=b.id;setTimeout(()=>burst(innerWidth/2,innerHeight*.35,44),300)}
+
+$('#mgo').onclick=()=>{$('#match').classList.remove('on');openChat($('#match').dataset.id)};$('#mx').onclick=()=>$('#match').classList.remove('on');
+/* Chatliste */
+function renderList(){const l=$('#list'),ids=Object.keys(S.chats);
+if(!ids.length){l.innerHTML='<div class="empty"><p style="font-size:40px">💌</p><p>Noch keine Matches. Entdecke Profile und tippe auf ♥.</p></div>';return}
+l.innerHTML='';ids.forEach((id,i)=>{const b=bot(id),c=S.chats[id],last=c.m[c.m.length-1],r=document.createElement('button');r.className='row';r.style.animationDelay=i*70+'ms';
+r.innerHTML=`<div class="av" style="--p:${lvl(id)*100}">${avHTML(b,blur(id))}</div><div class="m"><strong>${b.n}</strong><small>${last?esc(last.t):'Sag Hallo!'}</small></div>${c.unread?'<span class="dot"></span>':''}`;r.onclick=()=>openChat(id);l.appendChild(r)})}
+const esc=s=>s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+function skeleton(){$('#list').innerHTML='<div class="sk"></div><div class="sk"></div><div class="sk"></div>'}
+/* Chat */
+let CID=null,timers={},busyBot={};
+const ta=$('#ta'),sb=$('#send'),box=$('#msgs');
+function fit(){ta.style.height='auto';ta.style.height=Math.min(ta.scrollHeight,140)+'px'}
+function upd(){sb.disabled=!ta.value.trim()}
+function bubble(m,anim=true){const d=document.createElement('div');d.className='b '+m.r;d.textContent=m.t;if(!anim)d.style.animation='none';box.appendChild(d);box.scrollTop=box.scrollHeight}
+function hdr(){const b=bot(CID),a=$('#cav');a.style.setProperty('--p',lvl(CID)*100);a.innerHTML=avHTML(b,blur(CID));$('#cn').textContent=b.n;$('#cs').textContent='Demo-Bot · simuliert';$('#pg').style.width=lvl(CID)*100+'%'}
+function openChat(id){CID=id;const c=S.chats[id];c.unread=0;save();hdr();box.innerHTML='';box.style.scrollBehavior='auto';
+if(!c.m.length)bubble({r:'sys',t:'Alle Profile und Nachrichten sind simulierte Demo-Inhalte.'},false);c.m.forEach(m=>bubble(m,false));
+$('#chat').classList.add('on');setTimeout(()=>{box.style.scrollBehavior='';box.scrollTop=box.scrollHeight;ta.focus({preventScroll:true})},400);
+if(!c.started){c.started=true;save();schedule(id,'greet',1400)}else idleTimer(id)}
+$('#back').onclick=()=>{$('#chat').classList.remove('on');CID=null;renderList();go('chats')};
+function add(id,r,t){const c=S.chats[id];const m={r,t,ts:Date.now()};c.m.push(m);if(id===CID)bubble(m);else c.unread=1;save()}
+let sending=false;
+function sendMsg(){const t=ta.value.trim();if(!t||sending||!CID)return;sending=true;ta.value='';fit();upd();add(CID,'u',t);
+const id=CID,c=S.chats[id],before=lvl(id);learn(c,t);hdr();if(before<1&&lvl(id)>=1)unlock(id);
+sending=false;ta.focus();schedule(id,null,0,t)}
+sb.onclick=sendMsg;ta.oninput=()=>{fit();upd()};
+ta.onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();sendMsg()}};
+function unlock(id){const a=$('#cav');a.classList.add('glow');setTimeout(()=>a.classList.remove('glow'),1700);const r=a.getBoundingClientRect();burst(r.x+r.width/2,r.y+r.height/2,30);toast('Profilbild freigeschaltet ✨')}
+function learn(c,t){const l=t.toLowerCase();for(const k in HOB)if(HOB[k].test(l)&&!c.mem.h.includes(k))c.mem.h.push(k)}
+/* Bot-Logik */
+function pickNew(c,arr){const f=arr.filter(x=>!c.used.includes(x));const p=rnd(f.length?f:arr);c.used.push(p);if(c.used.length>70)c.used.shift();return p}
+function compose(id,forced,text){const c=S.chats[id],B=BK[id],b=bot(id),l=(text||'').toLowerCase(),me=S.me||{hobbies:[]};
+const lastB=[...c.m].reverse().find(x=>x.r==='b'),asked=lastB&&/\?\s*\S{0,3}$/.test(lastB.t);let tp=forced,hb=null,hw=null;
+if(!tp){for(const [k,re] of TOP)if(re.test(l)){tp=k;break}
+for(const k in HOB){const mm=l.match(HOB[k]);if(mm){hb=k;hw=mm[0][0].toUpperCase()+mm[0].slice(1);if(!tp||['day','joke','greet'].includes(tp))tp='hobby';break}}
+if(!tp&&asked&&l.length>3&&!/\?/.test(l))tp='ack';
+if(!tp&&/\?\s*$|und du|bei dir/.test(l))tp='story';
+if(!tp)tp=l.length<12&&Math.random()<.5?'short':rnd(['fb','story','fb'])}
+let out;
+if(tp==='about')out=`Ich bin ${b.a} und ${b.job}. ${b.fun}`;
+else if(tp==='short')out=pickNew(c,SH);
+else if(tp==='ack'){const w=(l.match(/[a-zäöüß]{5,}/g)||[]).find(x=>!STOP.test(x));out=w?pickNew(c,ACK).replace('{w}',w[0].toUpperCase()+w.slice(1))+PS[id]:pickNew(c,B.fb)}
+else out=pickNew(c,B[tp]);
+const h=hw||rnd(c.mem.h.length?c.mem.h:me.hobbies.length?me.hobbies:['das']);out=out.replace(/\{h\}/g,h);
+if(tp==='hobby'&&hb&&Math.random()<.7)out+=' '+pickNew(c,HS[hb]);
+if(tp==='greet'&&forced){if(me.name)out+=` Schön, dich kennenzulernen, ${me.name}.`;if(me.hobbies.length)out+=` In deinem Steckbrief steht ${rnd(me.hobbies)}, das macht mich neugierig.`}
+if(S.astro&&me.sign&&!c.as&&c.m.length>6&&Math.random()<.25){c.as=1;out+=` Übrigens, du bist ${me.sign}, oder? Ich bin ${b.sg}. Glaubst du, das passt?`}
+else if(tp!=='hobby'&&tp!=='greet'&&c.mem.h.length&&c.m.length-(c.cb||0)>10&&Math.random()<.25){c.cb=c.m.length;out+=' '+CB[id].replace(/\{h\}/g,rnd(c.mem.h))}
+else if(!/\?/.test(out)&&tp!=='short'&&!asked&&c.m.length>3&&Math.random()<.25)out+=' '+pickNew(c,QS);
+const parts=[out];if(out.length>120&&Math.random()<.4){const m=out.slice(40).search(/[.!?] /);if(m>-1){const k=40+m+1;parts.splice(0,1,out.slice(0,k),out.slice(k+1))}}return parts}
+async function aiReply(id,forced){const c=S.chats[id],me=S.me||{};
+const r=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},signal:AbortSignal.timeout(22000),body:JSON.stringify({bot:id,mode:forced==='greet'?'greet':forced?'idle':'reply',me:{name:me.name,age:me.age,per:me.per,hobbies:me.hobbies,sign:S.astro?me.sign:null},msgs:c.m.slice(-24).map(x=>({r:x.r,t:x.t}))})});
+if(!r.ok)throw 0;const d=await r.json();return d.parts&&d.parts.length?d.parts:null}
+function schedule(id,forced,delay,text){clearTimeout(timers[id]);clearTimeout(timers[id+'i']);const tk=timers[id+'t']=(timers[id+'t']||0)+1;
+timers[id]=setTimeout(async()=>{if(id===CID)typing(true);let parts=null,t0=Date.now();try{parts=await aiReply(id,forced)}catch(e){}
+if(tk!==timers[id+'t'])return;if(!parts){parts=compose(id,forced,text);await new Promise(r=>setTimeout(r,Math.max(0,700-(Date.now()-t0))))}deliver(id,parts,0)},delay||(400+Math.random()*700))}
+function deliver(id,parts,i){timers[id]=setTimeout(()=>{if(id===CID)typing(false);add(id,'b',parts[i]);if(id!==CID&&i===0)toast(bot(id).n+' hat dir geschrieben');
+if(i+1<parts.length){if(id===CID)typing(true);deliver(id,parts,i+1)}else idleTimer(id)},i===0?250:Math.min(3000,500+parts[i].length*20))}
+function typing(on){const o=$('#ty');if(o)o.remove();if(on){const d=document.createElement('div');d.id='ty';d.className='b b typing';d.innerHTML='<i></i><i></i><i></i>';box.appendChild(d);box.scrollTop=box.scrollHeight}}
+function idleTimer(id){clearTimeout(timers[id+'i']);timers[id+'i']=setTimeout(()=>{const c=S.chats[id];const last=c.m[c.m.length-1];if(last&&last.r==='b'&&!c.idled&&c.m.length>1){c.idled=1;schedule(id,'story',200)}},45000)}
+/* Onboarding und Profil */
+let Q={i:0,a:{}};
+function renderOnb(anim=true){const o=$('#onb'),n=STEPS.length,i=Q.i,a=Q.a;o.classList.add('on');let h=`<div class="obar"><i style="width:${i/n*100}%"></i></div>`;
+if(i===n){const t=TYPES[a.per??1];h+=`<div class="step" style="text-align:center"><div class="big">${t[1]}</div><h2>${t[0]}</h2><p class="note">${t[2]}</p><p class="note">Wir suchen jetzt Profile, die zu dir passen könnten.</p><div class="nx"><button class="btn" id="fin">Profile entdecken</button></div></div>`}
+else{const s=STEPS[i];h+=`<div class="step${anim?'':' na'}"><p class="oq">${s.q}</p>`;
+if(s.t==='text')h+=`<input id="in-n" class="inp" placeholder="Dein Vorname" maxlength="20" value="${esc(a.name||'')}"><input id="in-a" class="inp" inputmode="numeric" placeholder="Dein Alter" maxlength="2" value="${a.age||''}"><p class="note" id="err"></p>`;
+else if(s.t==='astro'){h+=`<div class="opts"><button class="opt${a.astro===true?' sel':''}" data-j="0">Ja, ein bisschen Magie darf sein</button><button class="opt${a.astro===false?' sel':''}" data-j="1">Nein, eher nicht</button></div>`;
+if(a.astro)h+=`<div class="ibox">✦ Wenn du Sternzeichen aktivierst, passen sich die vorgeschlagenen Personen an dein Sternzeichen an.</div><div class="opts g">${SIGNS.map(x=>`<button class="opt sm${a.sign===x?' sel':''}" data-sg="${x}">${x}</button>`).join('')}</div>`}
+else if(s.t==='multi')h+=`<div class="opts g">${s.o.map(x=>`<button class="opt sm${(a[s.k]||[]).includes(x)?' sel':''}" data-j="${x}">${x}</button>`).join('')}</div>`;
+else h+=`<div class="opts">${s.o.map((x,j)=>`<button class="opt${a[s.k]===j?' sel':''}" data-j="${j}">${x}</button>`).join('')}</div>`;
+h+=`<div class="nx">${i?'<button class="btn ghost" id="pv">Zurück</button>':''}<button class="btn" id="nx">Weiter</button></div></div>`}
+o.innerHTML=h;
+$$('#onb .opt').forEach(b=>b.onclick=()=>{const s=STEPS[Q.i];
+if(b.dataset.sg){a.sign=b.dataset.sg;return renderOnb(false)}
+if(s.t==='multi'){const l=a[s.k]=a[s.k]||[],p=l.indexOf(b.dataset.j);p<0?l.push(b.dataset.j):l.splice(p,1);b.classList.toggle('sel')}
+else if(s.t==='astro'){a.astro=b.dataset.j==='0';renderOnb(false)}
+else{a[s.k]=+b.dataset.j;$$('#onb .opt').forEach(x=>x.classList.toggle('sel',x===b))}});
+if($('#pv'))$('#pv').onclick=()=>{Q.i--;renderOnb()};
+if($('#nx'))$('#nx').onclick=()=>{const s=STEPS[Q.i];
+if(s.t==='text'){const nm=$('#in-n').value.trim(),g=parseInt($('#in-a').value,10);a.name=nm;a.age=g;if(!nm){$('#err').textContent='Bitte gib einen Namen ein.';return}if(!(g>=18&&g<100)){$('#err').textContent='Blindly ist erst ab 18. Bitte gib dein Alter an.';return}}
+else if(s.t==='multi'){if(!(a[s.k]||[]).length)return toast('Wähle mindestens ein Hobby')}
+else if(s.t==='astro'){if(a.astro===undefined)return toast('Bitte wähle eine Antwort');if(a.astro&&!a.sign)return toast('Wähle dein Sternzeichen')}
+else if(a[s.k]===undefined)return toast('Bitte wähle eine Antwort');
+Q.i++;renderOnb()};
+if($('#fin'))$('#fin').onclick=()=>{S.me={name:a.name,age:a.age,per:a.per??1,hobbies:a.hob||[],goal:a.goal,we:a.we,nt:a.nt,sign:a.sign||null};S.astro=!!a.astro;save();o.classList.remove('on');renderStack();renderProfile();toast('Willkommen, '+a.name)}}
+function renderProfile(){const m=S.me;if(!m)return;const t=TYPES[m.per];
+$('#prof').innerHTML=`<div class="pcard"><div class="mono">${esc(m.name[0].toUpperCase())}</div><h3>${esc(m.name)}, ${m.age}</h3><p class="pty">${t[1]} ${t[0]}</p><p class="note">${t[2]}</p><div class="tags">${m.hobbies.map(h=>`<span>${h}</span>`).join('')}</div></div>
+<div class="setr"><div><strong>Sternzeichen-Matching</strong><small>${m.sign||'Kein Sternzeichen gewählt'}</small></div><button class="sw${S.astro?' on':''}" id="swa" aria-label="Sternzeichen-Matching umschalten"><i></i></button></div>
+<div class="ibox">✦ Wenn aktiviert, passen sich die vorgeschlagenen Personen an dein Sternzeichen an.</div>
+<div class="pb"><button class="btn ghost" id="rq">Quiz wiederholen</button><button class="btn ghost" id="rs">Alles zurücksetzen</button></div>
+<p class="note">Alle Profile und Nachrichten in Blindly sind simulierte Demo-Inhalte. Die Personen sind Chatbots, keine echten Menschen. Alles bleibt lokal in deinem Browser gespeichert.</p>`;
+$('#swa').onclick=()=>{S.astro=!S.astro;save();toast(S.astro?'Vorschläge angepasst ✦':'Sternzeichen-Matching aus');renderStack();renderProfile()};
+$('#rq').onclick=()=>{Q={i:0,a:{}};renderOnb()};
+$('#rs').onclick=()=>{S={me:null,astro:false,dec:{},chats:{}};save();Q={i:0,a:{}};renderOnb();renderStack();renderList();$('#prof').innerHTML=''}}
+function stars(){const b=$('#bg');for(let i=0;i<46;i++){const s=document.createElement('i');s.className='st';s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*70}%;--d:${2+Math.random()*4}s;animation-delay:${-Math.random()*5}s;transform:scale(${.5+Math.random()})`;b.appendChild(s)}}
+stars();skeleton();$('#stack').innerHTML='<div class="sk" style="height:100%;border-radius:36px"></div>';
+if(!S.me){Q={i:0,a:{}};renderOnb()}else renderProfile();
+setTimeout(()=>{renderStack();renderList()},red?0:900);
+</script></body></html>
